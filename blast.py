@@ -21,9 +21,8 @@ for record in fasta:
 
 
 # Write title and sequence to fasta file
-with open('blast_result2', 'w') as out:
-    for res in results:
+with open(out, 'w') as out:
+    for res, fasta in zip(results, SeqIO.parse(path, format='fasta')):
         for record in res:
             name = record.alignments[0].title
-            seq = record.alignments[0].hsps[0].query
-            out.write(f'>{name}\n{seq}\n\n')
+            out.write(f'>{name}\n{fasta.seq}\n\n')
