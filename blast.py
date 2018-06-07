@@ -11,14 +11,22 @@ fasta = SeqIO.parse(path, format='fasta')
 results = []
 
 # Search blast
-print('Search')
-
 for record in fasta:
-    results.append(NCBIWWW.qblast('blastx', 'nr', record.seq, format_type='Text', alignments=2, descriptions=2))
-    time.sleep(5)
-# Write output
+    results.append(NCBIWWW.qblast('blastn', 'nt', record.seq, format_type='Text', alignments=1, descriptions=1))
+    # Awful additional delay
+    time.sleep(10)
+
+
+
+# Write title and sequence to fasta file
 with open('blast_result', 'w') as out:
-    out.write('\n'.join([res.read() for res in results]))
+    for res, fasta in zip(results, SeqIO.parse(path, format='fasta')):
+        rres = filter(None, res.read().split('\n'))
+        for line in rres:
+            if line.startswith('Sequences producing significant alignments:'):
+                a = next(rres)
+                out.write(f'>{a}\n{fasta.seq}')
+
 
 # result_handle = NCBIWWW.qblast("blastn", "nt", fasta.seq)
 #
