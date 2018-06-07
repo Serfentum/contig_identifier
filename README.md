@@ -8,4 +8,5 @@ Tool for identifying fasta contigs via blast
 
 
 # Launch
-There is currently just one way to use - as script
+There is currently just one way to use - as script.
+Modify variable path to name of your file
