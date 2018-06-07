@@ -5,38 +5,25 @@ import time
 
 
 path = 'test_blast.fasta'
+out = 'named_contigs'
 
 # Load data
 fasta = SeqIO.parse(path, format='fasta')
 results = []
 
-# Search blast
+# Search blast and parse its output
 for record in fasta:
-    results.append(NCBIWWW.qblast('blastn', 'nt', record.seq, format_type='Text', alignments=1, descriptions=1))
+    res = NCBIWWW.qblast('blastn', 'nt', record.seq, alignments=1, descriptions=1)
+    parsed = NCBIXML.parse(res)
+    results.append(parsed)
     # Awful additional delay
     time.sleep(10)
 
 
-
 # Write title and sequence to fasta file
-with open('blast_result', 'w') as out:
-    for res, fasta in zip(results, SeqIO.parse(path, format='fasta')):
-        rres = filter(None, res.read().split('\n'))
-        for line in rres:
-            if line.startswith('Sequences producing significant alignments:'):
-                a = next(rres)
-                out.write(f'>{a}\n{fasta.seq}')
-
-
-# result_handle = NCBIWWW.qblast("blastn", "nt", fasta.seq)
-#
-# blast_records = NCBIXML.parse(result_handle)
-#
-# for blast_record in blast_records:
-#     for alignment in blast_record.alignments:
-#         for hsp in alignment.hsps:
-#             print('sequence:', alignment.title)
-#             print('{} ... '.format(hsp.query[0:50]))
-#             print('{} ... '.format(hsp.match[0:50]))
-#             print('{} ... '.format(hsp.sbjct[0:50]))
-#             input()
+with open('blast_result2', 'w') as out:
+    for res in results:
+        for record in res:
+            name = record.alignments[0].title
+            seq = record.alignments[0].hsps[0].query
+            out.write(f'>{name}\n{seq}\n\n')
